@@ -1,0 +1,178 @@
+
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belajar Nama Hewan</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #a8e063, #56ab2f);
+            color: #333;
+            user-select: none;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            padding: 30px;
+            border-radius: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 400px;
+        }
+        h1 {
+            font-size: 1.8rem;
+            color: #3498db;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px #eee;
+        }
+        .animal-card {
+            background-color: #f1f1f1;
+            padding: 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out, border-color 0.2s ease;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+        }
+        .animal-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+        .animal-emoji {
+            font-size: 150px;
+            line-height: 1;
+            animation: pulse 1s infinite alternate;
+        }
+        .animal-card.clicked .animal-emoji {
+            animation: bounce 0.5s;
+        }
+        .animal-name {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-top: 10px;
+        }
+        .control-button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 50px;
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        .control-button:hover {
+            background-color: #2980b9;
+        }
+        .control-button:active {
+            transform: translateY(2px);
+            box-shadow: 0 3px 10px rgba(52, 152, 219, 0.4);
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.02); }
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Belajar Nama Hewan!</h1>
+        <div id="animalCard" class="animal-card">
+            <span id="animalEmoji" class="animal-emoji"></span>
+            <div id="animalName" class="animal-name"></div>
+        </div>
+        <button id="nextButton" class="control-button">Hewan Selanjutnya</button>
+    </div>
+
+    <script>
+        // Array hewan dengan nama Inggris dan emoji
+        const animals = [
+            { name: "Cat", emoji: "🐱" },
+            { name: "Dog", emoji: "🐶" },
+            { name: "Cow", emoji: "🐮" },
+            { name: "Sheep", emoji: "🐑" },
+            { name: "Duck", emoji: "🦆" },
+            { name: "Pig", emoji: "🐷" },
+            { name: "Lion", emoji: "🦁" },
+            { name: "Elephant", emoji: "🐘" },
+            { name: "Bear", emoji: "🐻" },
+            { name: "Rabbit", emoji: "🐰" },
+            { name: "Chicken", emoji: "🐔" },
+            { name: "Monkey", emoji: "🐵" },
+            { name: "Tiger", emoji: "🐯" },
+            { name: "Zebra", emoji: "🦓" },
+            { name: "Panda", emoji: "🐼" }
+        ];
+
+        let currentAnimalIndex = 0;
+        const animalCard = document.getElementById("animalCard");
+        const animalEmoji = document.getElementById("animalEmoji");
+        const animalName = document.getElementById("animalName");
+        const nextButton = document.getElementById("nextButton");
+
+        // Objek sintesis ucapan untuk mengucapkan nama hewan
+        const synth = window.speechSynthesis;
+
+        function displayAnimal(index) {
+            const animal = animals[index];
+            animalEmoji.textContent = animal.emoji;
+            animalName.textContent = animal.name;
+        }
+
+        function speakAnimalName() {
+            const animal = animals[currentAnimalIndex];
+            const utterance = new SpeechSynthesisUtterance(animal.name);
+
+            // Mencari suara yang ceria dan cerah (seperti "Puck")
+            const voices = synth.getVoices();
+            const chosenVoice = voices.find(voice => voice.name.includes("Puck") || voice.name.includes("Leda") || voice.name.includes("Zephyr"));
+            if (chosenVoice) {
+                utterance.voice = chosenVoice;
+            } else {
+                utterance.lang = 'en-US'; // Default jika suara spesifik tidak ditemukan
+            }
+
+            synth.speak(utterance);
+            
+            // Tambahkan animasi pada emoji saat diklik
+            animalCard.classList.add('clicked');
+            setTimeout(() => {
+                animalCard.classList.remove('clicked');
+            }, 500);
+        }
+
+        function showNextAnimal() {
+            currentAnimalIndex = (currentAnimalIndex + 1) % animals.length;
+            displayAnimal(currentAnimalIndex);
+            speakAnimalName();
+        }
+
+        // Event listeners
+        animalCard.addEventListener("click", speakAnimalName);
+        nextButton.addEventListener("click", showNextAnimal);
+
+        // Tampilan awal dan ucapan saat halaman dimuat
+        window.onload = function() {
+            displayAnimal(currentAnimalIndex);
+            // Tunggu sebentar sebelum mengucapkan nama pertama
+            setTimeout(speakAnimalName, 500);
+        };
+    </script>
+</body>
+</html>
